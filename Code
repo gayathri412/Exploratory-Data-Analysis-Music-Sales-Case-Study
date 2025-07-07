@@ -1,0 +1,114 @@
+CODE:
+
+# Importing necessary libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Read the CSV file (replace with actual path or URL)
+df = pd.read_csv("music_sales.csv")  
+
+# View top and bottom rows
+print(df.head())         # First 5 rows
+print(df.tail(15))       # Last 15 rows
+
+# Data summary
+print(df.info())         # Data types, nulls
+print(df.describe())     # Numerical stats
+
+# Length of dataset
+print(len(df))
+
+# Unique values in Format and Metric columns
+print(df["Format"].unique())
+print(df["Format"].nunique())
+print(df["Metric"].unique())
+print(df["Metric"].nunique())
+
+# Grouping by Year and computing the mean of 'Value (Actual)'
+yearly_mean = df.groupby("Year")["Value (Actual)"].mean()
+print(yearly_mean.head())
+print(yearly_mean.tail())
+
+# Statistical summary
+print(yearly_mean.std())
+print(yearly_mean.max())
+print(yearly_mean.min())
+print(yearly_mean.var())
+
+# Top 3 years by mean value
+print(yearly_mean.sort_values(ascending=False).head(3))
+
+# Top 15 years by mean value
+yearly_mean_top15 = yearly_mean.sort_values(ascending=False).head(15)
+# Last 4 entries from the top 15
+print(yearly_mean_top15.tail(4))
+
+# Plotting
+sns.barplot(x=yearly_mean_top15.index, y=yearly_mean_top15.values)
+plt.title("Mean value per year")
+plt.xlabel("Year")
+plt.ylabel("Mean Value")
+plt.show()
+
+
+print(df["Format"].value_counts().head(3))
+
+# Sorting by Year
+df_sorted = df.sort_values("Year")
+
+# Line Plot: Value (Actual) over Year
+plt.plot(df_sorted["Year"], df_sorted["Value (Actual)"], marker="o")
+plt.title("Value over time")
+plt.xlabel("Year")
+plt.ylabel("Value (Actual)")
+plt.grid(True)
+plt.show()
+
+# Total value per Format
+print(df.groupby("Format")["Value (Actual)"].sum())
+
+# Max value per Metric
+print(df.groupby("Metric")["Value (Actual)"].max())
+
+# Mean by Year and Format
+print(df.groupby(["Year", "Format"])["Value (Actual)"].mean())
+
+# Reset index to get a cleaner dataframe
+print(df.groupby(["Year", "Format"])["Value (Actual)"].mean().reset_index())
+
+sns.boxplot(x="Format", y="Value (Actual)", data=df.head(300))
+plt.title("Distribution of Value by Format")
+plt.xlabel("Format")
+plt.ylabel("Value")
+plt.show()
+
+# Check column names first
+print(df.columns)
+
+# ensure correct naming
+sns.pairplot(df, vars=["Year", "Number of Records", "Value (Actual)"], hue="Format")
+plt.suptitle("Pairplot of Year, Number of Records, and Value by Format", y=1.02)
+plt.show()
+
+# Total value per year by Metric
+year_metric_sum = df.groupby(["Year", "Metric"])["Value (Actual)"].sum().unstack()
+print(year_metric_sum)
+
+# Plotting stacked bar
+year_metric_sum.plot(kind="bar", stacked=True)
+plt.title("Total Value per Year by Metric")
+plt.xlabel("Year")
+plt.ylabel("Total Value")
+plt.show()
+
+# Grouping and reshaping
+format_year_avg = df.groupby(["Format", "Year"])["Value (Actual)"].mean().unstack()
+print(format_year_avg.T)
+
+# Transpose and plot
+format_year_avg.T.plot(marker="o")
+plt.title("Average Value per Format Over Years")
+plt.ylabel("Average Value")
+plt.xlabel("Year")
+plt.show()
